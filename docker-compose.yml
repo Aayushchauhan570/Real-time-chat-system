@@ -1,0 +1,28 @@
+services:
+  app:
+    build: ./server
+    ports:
+      - "5002:5002"
+
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+    depends_on:
+      - redis
+
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  redis:
+    image: redis:latest
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
