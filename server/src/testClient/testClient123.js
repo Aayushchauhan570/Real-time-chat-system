@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import readline from "readline";
 
 const socket = io("http://localhost:5002");
 const currentUser = '123'; // Replace with the actual current user ID
@@ -32,16 +33,47 @@ socket.on("newMessage", (message) => {
     socket.emit('messageDelivered', { messageId: message.id, senderId: message.senderId, status: 'delivered' });
 
     setTimeout(() => {
-        socket.emit('messageSeen', { messageId: message.id, senderId: message.senderId, receiverId: message.receiverId, status: 'seen' });
-    }, 20000);
+        socket.emit('conversationOpened', { messageId: message.id, senderId: message.senderId, receiverId: message.receiverId, status: 'seen' });
+    }, 5000);
 });
 
 socket.on('messageStatusUpdated', (data) => {
     console.log("\n✅ Message Status Updated:");
     console.log(data);
+});
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.on("line", () => {
+    socket.emit("typing", {
+        senderId: "123",
+        receiverId: "xyz",
+        // conversationId: "123:xyz"
+    });
+});
+
+rl.on("pause", () => {
+    socket.emit("stopTyping", {
+        senderId: "123",
+        receiverId: "xyz"
+    });
+});
+
+// rl.pause();
+
+socket.on("userStopTyping", (data) => {
+    console.log(data);
+    console.log(`\n💬 ${data.senderId} stopped typing.`);
+});
+
+
+socket.on("userTyping", (data) => {
+    console.log(data);
+    console.log(`\n💬 ${data.senderId} is typing...`);
 })
-
-
 
 socket.on("disconnect", () => {
     console.log("Disconnected");

@@ -1,4 +1,22 @@
-import {conversation, getConverstion, removeMessageFromList, publisher, saveMessage,setUnreadCount, getUnreadCount} from '../redis/redisHelper.js';
+import {
+    saveMessage,
+    getMessageById,
+    updateMessageStatus
+} from '../redis/repositories/messageRepository.js';
+
+import {
+    conversation,
+    getConversation,
+    removeMessageFromList
+} from '../redis/repositories/conversationRepository.js';
+
+import {
+    setUnreadCount,
+    getUnreadCount,
+    resetUnReadCount
+} from '../redis/repositories/unreadAndSeenRepository.js';
+
+import { publisher } from '../redis/pubsub/publisher.js';
 import idGenerator from '../utils/idGenerator.js';
 
 export const sendMessageService = async (messageData) => {
@@ -15,7 +33,7 @@ export const sendMessageService = async (messageData) => {
 }
 export const getMessagesService = async (userId1, userId2) => {
     try{
-        const messages = await getConverstion(userId1, userId2);
+        const messages = await getConversation(userId1, userId2);
         return messages;
     } catch (error) {
         console.log("error during fetching messages", error);
