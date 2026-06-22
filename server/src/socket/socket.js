@@ -1,6 +1,7 @@
 import {Server} from 'socket.io';
 import {resetUnReadCount} from '../redis/repositories/unreadAndSeenRepository.js';
 import {updateMessageStatus} from '../redis/repositories/messageRepository.js';
+import { setUserPresence } from '../redis/repositories/presenceRepository.js';
 
 let io;
 
@@ -19,12 +20,19 @@ export const initSocket = (server) => {
             console.log(`User ${socket.id} joined room ${roomId}`);
         })
 
-        socket.on('joinUser', (userId) => {
+        socket.on('joinUser', async (userId) => {
+            socket.userId = userId; // Store userId in socket object for later use
+            console.log("join user event received for userId: ", userId);
             socket.join(userId);
+            await setUserPresence(userId, true)
+            io.emit("userOnline", userId );
             console.log(`User ${socket.id} joined user room ${userId}`);
         })
 
-        socket.on('disconnect',() => {
+        socket.on('disconnect',async () => {
+            const userId = socket.userId;
+            await setUserPresence(userId, false);
+            io.emit("userOffline", userId );
             console.log('user disconnected');
         })
 

@@ -51,12 +51,10 @@ rl.on("line", () => {
     });
 });
 
-rl.on("pause", () => {
-    socket.emit("stopTyping", {
+socket.emit("stopTyping", {
         senderId: "xyz",
         receiverId: "123"
     });
-});
 
 // rl.pause();
 
@@ -64,6 +62,14 @@ socket.on("userStopTyping", (data) => {
     console.log(data);
     console.log(`\n💬 ${data.senderId} stopped typing.`);
 });
+
+socket.on("userOnline", (data) => {
+    console.log(`${data} is online.`)
+})
+
+socket.on("userOffline", (data) => {
+    console.log(`${data} goes offline.`)
+})
 
 socket.on('messageStatusUpdated', (data) => {
     console.log("\n✅ Message Status Updated:");

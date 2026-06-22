@@ -16,6 +16,8 @@ import {
     resetUnReadCount
 } from '../redis/repositories/unreadAndSeenRepository.js';
 
+import { getUserPresence } from '../redis/repositories/presenceRepository.js'
+
 import { publisher } from '../redis/pubsub/publisher.js';
 import idGenerator from '../utils/idGenerator.js';
 
@@ -55,5 +57,14 @@ export const getUnreadCountService = async (userId1, userId2) => {
         return count;
     } catch (error) {
         console.log("error during fetching unread count", error.message);
+    }
+}
+
+export const checkUserPresenceService = async (userId) => {
+    try {
+        const userData = await getUserPresence(userId);
+        return userData;
+    } catch (error) {
+        console.log("error during checking user presence", error.message);
     }
 }

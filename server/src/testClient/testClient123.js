@@ -55,12 +55,10 @@ rl.on("line", () => {
     });
 });
 
-rl.on("pause", () => {
-    socket.emit("stopTyping", {
+socket.emit("stopTyping", {
         senderId: "123",
         receiverId: "xyz"
     });
-});
 
 // rl.pause();
 
@@ -73,6 +71,14 @@ socket.on("userStopTyping", (data) => {
 socket.on("userTyping", (data) => {
     console.log(data);
     console.log(`\n💬 ${data.senderId} is typing...`);
+})
+
+socket.on("userOnline", (data) => {
+    console.log(`${data} is online.`)
+})
+
+socket.on("userOffline", (data) => {
+    console.log(`${data} goes offline.`)
 })
 
 socket.on("disconnect", () => {
