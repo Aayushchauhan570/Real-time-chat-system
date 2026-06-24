@@ -82,7 +82,15 @@ socket.on("userTyping", (data) => {
     console.log(`\n💬 ${data.senderId} is typing...`);
 });
 
+socket.on("messageEdited", (data) => {
+    console.log("\n✏️ Message Edited:");
+    console.log(data);
+})
 
+socket.on("messageDeleted", (data) => {
+    console.log("\n🗑️ Message Deleted:");
+    console.log(data);
+})
 
 
 socket.on("disconnect", () => {

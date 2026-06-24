@@ -15,15 +15,22 @@ export const conversation = async (messageData) => {
 
 
 // This function used to fetch all conversation messages between two users.
-export const getConversation = async (userId1, userId2) => {
+export const getConversation = async (userId1, userId2, offset = 0, limit = 20) => {
     const chatKey = [userId1, userId2].sort().join(':');
     try{
-        const messageIds = await redisClient.lrange(`chat:${chatKey}`, 0, -1);
+        const messageIds = await redisClient.lrange(`chat:${chatKey}`, offset, offset + limit - 1);
         let messages = [];
         // console.log("this is message ids in get conversation", messageIds);
-        messages = await Promise.all(messageIds.map(async (id) => {
-            return getMessageById(id);
-        }));
+        // messages = await Promise.all(messageIds.map(async (id) => {
+        //     return getMessageById(id);
+        // }));
+
+        const pipeline = redisClient.pipeline();
+        messageIds.forEach((id) => {
+            pipeline.hgetall(`message:${id}`);
+        });
+        const result = await pipeline.exec();
+        messages = result.map(([error, message]) => message);
         return messages;
     } catch (error) {
         console.log("error during fetching messages from redis", error);

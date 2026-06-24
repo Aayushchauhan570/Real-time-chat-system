@@ -84,3 +84,13 @@ socket.on("userOffline", (data) => {
 socket.on("disconnect", () => {
     console.log("Disconnected");
 });
+
+socket.on("messageEdited", (data) => {
+    console.log("\n✏️ Message Edited:");
+    console.log(data);
+})
+
+socket.on("messageDeleted", (data) => {
+    console.log("\n🗑️ Message Deleted:");
+    console.log(data);
+})

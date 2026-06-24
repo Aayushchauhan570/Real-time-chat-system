@@ -3,8 +3,12 @@ import {
     getMessagesService,
     removeConversationService,
     getUnreadCountService,
-    checkUserPresenceService
+    checkUserPresenceService,
+    editMessageService,
+    deleteMessageService
 } from '../services/chatService.js';
+
+import {getIO} from '../socket/socket.js';
 
 export const sendMessage = async (req, res) => {
     const { senderId, receiverId, message } = req.body;
@@ -22,14 +26,60 @@ export const sendMessage = async (req, res) => {
 
 export const getMessages = async (req, res) => {
     const { userId1, userId2 } = req.params;
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 20;
     if (!userId1 || !userId2) {
         return res.status(400).json({ error: 'userId1 and userId2 are required' });
     }
     try {
-        const messages = await getMessagesService(userId1, userId2);
-        return res.status(200).json({ success: true, messages });
+        const messages = await getMessagesService(userId1, userId2, offset, limit);
+        return res.status(200).json({ success: true, offset, limit, messages });
     } catch (error) {
         console.log("error during fetching messages", error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export const editMessage = async (req, res) => {
+    const { messageId } = req.params;
+    const { message } = req.body;
+    if (!messageId || !message) {
+        return res.status(400).json({ error: 'messageId and message are required' });
+    }
+    try {
+        const msg = await editMessageService(messageId, message);
+        const { senderId, receiverId } = msg;
+        const chatKey = [senderId, receiverId].sort().join(':');
+        const io = getIO();
+        io.to(chatKey).emit("messageEdited", { messageId, message });
+        return res.status(200).json({status: true, message: "message updated successfully"});
+    } catch (error) {
+        if(error.message === 'Message not found or has been deleted'){
+            return res.status(404).json({error: error.message});
+        }
+        const io = getIO();
+        io.to(chatKey).emit("messageEdited", { messageId, message });
+        return res.status(200).json({status: true, message: "message updated successfully"});
+    }
+}
+
+export const deleteMessage = async (req, res) => {
+    const { messageId } = req.params;
+    if (!messageId) {
+        return res.status(400).json({ error: 'messageId is required' });
+    }
+    try {
+        const msg = await deleteMessageService(messageId);
+        const { senderId, receiverId } = msg;
+        const chatKey = [senderId, receiverId].sort().join(':');
+        const io = getIO();
+        io.to(chatKey).emit("messageDeleted", { messageId });
+        return res.status(200).json({ success: true, message: 'Message deleted successfully' });
+    } catch (error) {
+        if(error.message === 'Message not found or has been deleted'){
+            return res.status(404).json({error: error.message});
+        }
+        console.log("error during deleting message", error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 }

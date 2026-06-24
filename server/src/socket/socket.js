@@ -4,6 +4,7 @@ import {updateMessageStatus} from '../redis/repositories/messageRepository.js';
 import { setUserPresence } from '../redis/repositories/presenceRepository.js';
 
 let io;
+// export let chatKey;
 
 export const initSocket = (server) => {
     io = new Server(server, {
@@ -16,6 +17,7 @@ export const initSocket = (server) => {
     io.on('connection', (socket) => {
         console.log('a user connected', socket.id);
         socket.on('joinRoom', (roomId) => {
+            // chatKey = roomId;
             socket.join(roomId);
             console.log(`User ${socket.id} joined room ${roomId}`);
         })
@@ -64,6 +66,12 @@ export const initSocket = (server) => {
             const {senderId, receiverId} = data;
             io.to(receiverId).emit("userStopTyping", {senderId});
         });
+
+        socket.on("messageEdited", (data) => {
+
+            io.to(data.receiverId).emit("messageEdited", data);
+        })
+
     })
 }
 
