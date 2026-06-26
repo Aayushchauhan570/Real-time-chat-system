@@ -2,7 +2,7 @@ import { redisClient } from "../redisClient.js";
 
 // This function saves the message data in Redis using a hash. The key is in the format `message:{messageId}` and the value is the message data object.
 export const saveMessage = async (messageData) => {
-    const mess_id = messageData.id;
+    // const mess_id = messageData.id;
     // console.log("this is message id in save message", mess_id);
     try {
         const data = await redisClient.hset(`message:${messageData.id}`, messageData);

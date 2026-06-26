@@ -39,4 +39,28 @@ redisSubscriber.on('message', (channel, message) => {
             console.log("Unknown event type received:", event.type);
     }
 
+});
+
+redisSubscriber.subscribe('group_chat_channel', (err, count) => {
+    if(err) {
+        console.log("error during subscribing to group channel", err);
+    }
+})
+
+redisSubscriber.on('message', (channel, message) => {
+    const event = JSON.parse(message);
+
+    switch(event.type){
+        case 'NEW_GROUP_MESSAGE': {
+            const messageData = event.data;
+            const io = getIO();
+
+            const groupRoomId = `group:${messageData.groupId}`;
+            io.to(groupRoomId).emit('newGroupMessage', messageData);
+            console.log("Group Message emitted to room", groupRoomId);
+            break;
+        }
+        default:
+            console.log("Unknown event type received:", event.type);
+    }
 })

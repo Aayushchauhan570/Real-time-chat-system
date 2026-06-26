@@ -13,6 +13,8 @@ socket.on("connect", () => {
     console.log("Joined user room 123");
     console.log("Joined room 123:xyz");
 
+    socket.emit("joinGroup", "group1");
+
 
 });
 

@@ -1,5 +1,5 @@
 import Router from 'express';
-import {sendMessage, getMessages, removeConversation, getUnreadCount, checkUserPresence, editMessage, deleteMessage } from '../controllers/chatController.js';
+import {sendMessage, getMessages, removeConversation, getUnreadCount, checkUserPresence, editMessage, deleteMessage, getConversationMetadata } from '../controllers/chatController.js';
 
 
 const router = Router();
@@ -16,5 +16,7 @@ router.get('/presence/:userId', checkUserPresence);
 router.patch('/editMessage/:messageId', editMessage);
 
 router.delete('/message/delete/:messageId', deleteMessage);
+
+router.get('/conversationMetadata/:senderId', getConversationMetadata);
 
 export default router;

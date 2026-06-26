@@ -10,3 +10,14 @@ export const publisher = async (messageData) => {
         console.log("error during publishing message to redis", error);
     }
 }
+
+
+export const groupPublisher = async (messageData) => {
+    const parsedMessageData = JSON.parse(JSON.stringify(messageData));
+    try {
+        await redisClient.publish('group_chat_channel', JSON.stringify({type: "NEW_GROUP_MESSAGE", data: parsedMessageData}));
+    } catch (error) {
+        console.log("error during publishing group message to redis", error);
+        throw new Error("error during publishing group message to redis", error);
+    }
+}

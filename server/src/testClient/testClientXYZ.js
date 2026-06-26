@@ -12,7 +12,7 @@ socket.on("connect", () => {
     socket.emit("joinUser", "xyz");
     console.log("Joined user room xyz");
     console.log("Joined room 123:xyz");
-
+    socket.emit("joinGroup", "group1");
 
 });
 

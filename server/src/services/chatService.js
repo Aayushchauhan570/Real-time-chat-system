@@ -9,7 +9,10 @@ import {
 import {
     conversation,
     getConversation,
-    removeMessageFromList
+    removeMessageFromList,
+    conversationList,
+    conversationMetadata,
+    getConversationMetadata
 } from '../redis/repositories/conversationRepository.js';
 
 import {
@@ -29,10 +32,12 @@ export const sendMessageService = async (messageData) => {
     try{
         await saveMessage(messageData);
         await conversation(messageData);
-        await setUnreadCount(messageData.senderId, messageData.receiverId);
-        await publisher(messageData);
+        await conversationList( messageData.senderId, messageData.receiverId );
+        await conversationMetadata( messageData );
+        await setUnreadCount( messageData.senderId, messageData.receiverId );
+        await publisher( messageData );
     } catch (error) {
-        console.log("error during sending message", error);
+        console.log("error during sending message", error );
     }
 }
 
@@ -99,5 +104,15 @@ export const checkUserPresenceService = async (userId) => {
         return userData;
     } catch (error) {
         console.log("error during checking user presence", error.message);
+    }
+}
+
+export const getConversationMetadataService = async (senderId) => {
+    try {
+        const metadata = await getConversationMetadata(senderId);
+        return metadata;
+    } catch (error) {
+        console.log("error during fetching conversation metadata", error.message);
+        throw new Error("Failed to fetch conversation metadata"); // Rethrow the error to be handled by the controller
     }
 }

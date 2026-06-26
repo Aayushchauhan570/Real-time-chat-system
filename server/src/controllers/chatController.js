@@ -5,7 +5,8 @@ import {
     getUnreadCountService,
     checkUserPresenceService,
     editMessageService,
-    deleteMessageService
+    deleteMessageService,
+    getConversationMetadataService
 } from '../services/chatService.js';
 
 import {getIO} from '../socket/socket.js';
@@ -121,6 +122,18 @@ export const checkUserPresence = async (req, res) => {
         return res.status(200).json({ success: true, userData });
     } catch (error) {
         console.log("error during checking user presence", error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+
+export const getConversationMetadata = async (req, res) => {
+    const { senderId } = req.params;
+    try {
+        const metadata = await getConversationMetadataService(senderId);
+        return res.status(200).json({ success: true, metadata });
+    } catch (error) {
+        console.log("error during fetching conversation metadata", error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 }

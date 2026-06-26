@@ -70,6 +70,11 @@ export const initSocket = (server) => {
         socket.on("messageEdited", (data) => {
 
             io.to(data.receiverId).emit("messageEdited", data);
+        });
+
+        socket.on("joinGroup", (groupId) => {
+            soocket.join(`group:${groupId}`);
+            console.log(`User ${socket.id} joined group room group:${groupId}`);
         })
 
     })
