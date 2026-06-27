@@ -1,11 +1,14 @@
 import {
     createGroup,
     addMemberToGroup,
+    groupMessages,
+    getGroupMessages,
+    getGroupMembers
 } from "../redis/repositories/groupRepository.js";
 
 import { saveMessage } from "../redis/repositories/messageRepository.js";
 
-import { generateId } from "../utils/idGenerator.js";
+import generateId  from "../utils/idGenerator.js";
 
 export const createGroupService = async (groupData) => {
     const { id, userId } = groupData;
@@ -55,16 +58,29 @@ export const sendGroupMessageService = async (messageData) => {
 }
 
 
-// export const getGroupMessagesService = async (groupId, page, limit) => {
-//     if (!page || !limit) {
-//         throw new Error('Page and limit parameters are required');
-//     }
-//     if( page < 1 || limit < 1) {
-//         throw new Error('Page and limit parameters must be greater than 0');
-//     }
+export const getGroupMessagesService = async (groupId, page, limit) => {
+    if (!page || !limit) {
+        throw new Error('Page and limit parameters are required');
+    }
+    if( page < 1 || limit < 1) {
+        throw new Error('Page and limit parameters must be greater than 0');
+    }
 
+    try {
+        const messages = await getGroupMessages(groupId, page, limit);
+        return messages;
+    } catch (error) {
+        console.error('Error getting group messages:', error);
+        throw new Error('Error getting group messages');
+    }
+}
 
-//     try {
-//         const messageIds = await r
-//     }
-// }
+export const getGroupMembersService = async (groupId) => {
+    try {
+        const members = await getGroupMembers(groupId);
+        return members;
+    } catch (error) {
+        console.error('Error getting group members:', error);
+        throw new Error('Error getting group members');
+    }
+}

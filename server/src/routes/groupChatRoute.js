@@ -1,17 +1,25 @@
 import { Router } from "express";
+import  {
+    createGroup,
+    addMemberToGroup,
+    sendGroupMessage,
+    getGroupMessages,
+    getGroupMembers,
+    // removeMemberFromGroup
+} from "../controllers/groupChatController.js";
 
 const router = Router();
 
-router.post('/group/create');
+router.post('/group/create', createGroup);
 
-router.post('/group/add-member');
+router.post('/group/add-member', addMemberToGroup);
 
-router.post('/group/message');
+router.post('/group/message', sendGroupMessage);
 
-router.get('/group/:groupId/messages');
+router.get('/group/:groupId/messages', getGroupMessages);
 
-router.get('/group/:groupId/members');
+router.get('/group/:groupId/members', getGroupMembers);
 
-router.delete('/group/:groupId/member/:memberId');
+// router.delete('/group/:groupId/member/:memberId', removeMemberFromGroup);
 
 export default router;
